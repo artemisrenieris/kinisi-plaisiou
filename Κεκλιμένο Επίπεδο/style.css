@@ -42,6 +42,10 @@ body {
     max(0.8rem, env(safe-area-inset-bottom)) max(0.8rem, env(safe-area-inset-left));
 }
 
+.mobile-title {
+  display: none;
+}
+
 .panel {
   background: var(--panel);
   border: 1px solid var(--line);
@@ -344,6 +348,24 @@ button:active {
   .layout {
     grid-template-columns: 1fr;
     min-height: auto;
+  }
+
+  .mobile-title {
+    display: block;
+    margin: 0;
+    font-size: 1.35rem;
+  }
+
+  .controls h1 {
+    display: none;
+  }
+
+  .sim-area {
+    order: 2;
+  }
+
+  .controls {
+    order: 3;
   }
 
   .controls {
