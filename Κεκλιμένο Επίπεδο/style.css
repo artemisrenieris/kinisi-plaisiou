@@ -33,6 +33,16 @@ body {
   overscroll-behavior-y: contain;
 }
 
+.top-copyright {
+  padding: 0.55rem 1rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #4a5d7a;
+  text-align: center;
+  background: rgba(255, 255, 255, 0.72);
+  border-bottom: 1px solid var(--line);
+}
+
 .layout {
   min-height: 100vh;
   display: grid;
