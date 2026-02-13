@@ -144,30 +144,6 @@ button:active {
   font-size: 0.94rem;
 }
 
-.timebar-labels {
-  display: flex;
-  justify-content: space-between;
-  font-size: 0.86rem;
-  font-weight: 700;
-  margin-bottom: 0.35rem;
-}
-
-.timebar {
-  width: 100%;
-  height: 10px;
-  border-radius: 999px;
-  background: #dbe5f1;
-  overflow: hidden;
-}
-
-.timebar-fill {
-  width: 0%;
-  height: 100%;
-  border-radius: 999px;
-  background: linear-gradient(90deg, #1d9bf0 0%, #005f73 100%);
-  transition: width 0.08s linear;
-}
-
 .sim-area {
   padding: 0.75rem;
   display: grid;
@@ -244,55 +220,32 @@ button:active {
   display: none;
 }
 
-.canvas-timebar-wrap {
+.canvas-mini-controls {
   position: absolute;
   left: 12px;
   right: 12px;
   bottom: 12px;
-  border: 1px solid #c9d7ea;
+  border: 1px solid #c7d4e7;
   border-radius: 10px;
-  padding: 0.38rem 0.52rem 0.5rem;
+  padding: 0.28rem;
   background: rgb(255 255 255 / 92%);
-  box-shadow: 0 6px 14px rgb(13 38 76 / 16%);
+  box-shadow: 0 4px 10px rgb(13 38 76 / 12%);
+  display: grid;
+  grid-template-columns: repeat(4, auto);
+  gap: 0.28rem;
 }
 
-.canvas-timebar-wrap .timebar {
-  position: relative;
+.canvas-mini-controls button {
+  min-height: 34px;
+  padding: 0.28rem 0.5rem;
+  border-radius: 8px;
+  font-size: 0.78rem;
+  font-weight: 800;
+  background: rgb(0 95 115 / 92%);
 }
 
-.time-stamp {
-  position: absolute;
-  top: 50%;
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  border: 2px solid #ffffff;
-  transform: translate(-50%, -50%);
-  box-shadow: 0 0 0 1px rgb(0 0 0 / 22%);
-  cursor: pointer;
-  pointer-events: auto;
-  z-index: 2;
-}
-
-.time-stamp::after {
-  content: "";
-  position: absolute;
-  inset: -10px;
-}
-
-.time-stamp.start {
-  left: 0%;
-  background: #0f172a;
-}
-
-.time-stamp.mid {
-  left: 50%;
-  background: #ff7b00;
-}
-
-.time-stamp.end {
-  left: 100%;
-  background: #005f73;
+#miniSlowBtn.slow-on {
+  background: #9b2226;
 }
 
 .legend {
@@ -391,9 +344,6 @@ button:active {
     height: 30px;
   }
 
-  .canvas-timebar-wrap {
-    padding: 0.42rem 0.56rem 0.56rem;
-  }
 }
 
 @media (max-width: 700px) {
@@ -430,15 +380,18 @@ button:active {
     margin: 0.15rem 0;
   }
 
-  .canvas-timebar-wrap {
+  .canvas-mini-controls {
     left: 8px;
     right: 8px;
     bottom: 8px;
-    padding: 0.32rem 0.42rem 0.45rem;
+    padding: 0.24rem;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0.22rem;
   }
 
-  .timebar-labels {
+  .canvas-mini-controls button {
+    min-height: 36px;
+    padding: 0.24rem 0.3rem;
     font-size: 0.72rem;
-    margin-bottom: 0.3rem;
   }
 }

@@ -15,6 +15,10 @@ const playBtn = document.getElementById("playBtn");
 const pauseBtn = document.getElementById("pauseBtn");
 const resetBtn = document.getElementById("resetBtn");
 const slowBtn = document.getElementById("slowBtn");
+const miniPlayBtn = document.getElementById("miniPlayBtn");
+const miniPauseBtn = document.getElementById("miniPauseBtn");
+const miniResetBtn = document.getElementById("miniResetBtn");
+const miniSlowBtn = document.getElementById("miniSlowBtn");
 const phPanel = document.getElementById("phPanel");
 const phBody = document.getElementById("phBody");
 const phToggleBtn = document.getElementById("phToggleBtn");
@@ -30,13 +34,6 @@ const dispValue = document.getElementById("dispValue");
 const currentHeightValue = document.getElementById("currentHeightValue");
 const heightValue = document.getElementById("heightValue");
 const impactValue = document.getElementById("impactValue");
-const timeStartValue = document.getElementById("timeStartValue");
-const timeMidValue = document.getElementById("timeMidValue");
-const timeEndValue = document.getElementById("timeEndValue");
-const timeFill = document.getElementById("timeFill");
-const stampStart = document.getElementById("stampStart");
-const stampMid = document.getElementById("stampMid");
-const stampEnd = document.getElementById("stampEnd");
 const phAccelValue = document.getElementById("phAccelValue");
 const phVelValue = document.getElementById("phVelValue");
 const phDispValue = document.getElementById("phDispValue");
@@ -47,9 +44,6 @@ const phImpactValue = document.getElementById("phImpactValue");
 const state = {
   thetaDeg: Number(angleSlider.value),
   planeLength: Number(lengthSlider.value),
-  stamp0Ratio: 0,
-  stamp1Ratio: 0.5,
-  stamp2Ratio: 1,
   m: Number(massSlider.value),
   mu: Number(muSlider.value),
   frictionOn: frictionToggle.checked,
@@ -68,51 +62,6 @@ const state = {
   a: 0,
   lastTime: null
 };
-
-function estimateTotalTime() {
-  if (state.impactTime !== null) {
-    return state.impactTime;
-  }
-
-  const remaining = state.planeLength - state.s;
-  if (remaining <= 0) {
-    return state.elapsedTime;
-  }
-
-  const a = state.a;
-  const v = state.v;
-
-  let timeRemaining = null;
-  if (Math.abs(a) < 1e-9) {
-    if (v > 0) {
-      timeRemaining = remaining / v;
-    }
-  } else {
-    const disc = v * v + 2 * a * remaining;
-    if (disc >= 0) {
-      const root = Math.sqrt(disc);
-      const tCandidate = (-v + root) / a;
-      if (tCandidate > 0) {
-        timeRemaining = tCandidate;
-      }
-    }
-  }
-
-  if (timeRemaining === null) {
-    return null;
-  }
-  return state.elapsedTime + timeRemaining;
-}
-
-function timeFromStartForDistance(distance) {
-  if (distance <= 0) {
-    return 0;
-  }
-  if (state.a <= 0) {
-    return null;
-  }
-  return Math.sqrt((2 * distance) / state.a);
-}
 
 function rampGeometry() {
   const theta = (state.thetaDeg * Math.PI) / 180;
@@ -177,27 +126,6 @@ function updateReadouts() {
   phHeightValue.textContent = (state.planeLength * Math.sin(theta)).toFixed(2);
   impactValue.textContent = state.impactSpeed === null ? "-" : `${state.impactSpeed.toFixed(2)} m/s`;
   phImpactValue.textContent = state.impactSpeed === null ? "-" : `${state.impactSpeed.toFixed(2)} m/s`;
-
-  const d0 = state.stamp0Ratio * state.planeLength;
-  const d1 = state.stamp1Ratio * state.planeLength;
-  const d2 = state.stamp2Ratio * state.planeLength;
-  const t0 = timeFromStartForDistance(d0);
-  const t1 = timeFromStartForDistance(d1);
-  const t2 = timeFromStartForDistance(d2);
-  timeStartValue.textContent = t0 === null ? "t0 = -" : `t0 = ${t0.toFixed(2)} s`;
-  timeMidValue.textContent = t1 === null ? "t1 = -" : `t1 = ${t1.toFixed(2)} s`;
-  timeEndValue.textContent = t2 === null ? "t2 = -" : `t2 = ${t2.toFixed(2)} s`;
-  stampStart.style.left = `${(state.stamp0Ratio * 100).toFixed(1)}%`;
-  stampMid.style.left = `${(state.stamp1Ratio * 100).toFixed(1)}%`;
-  stampEnd.style.left = `${(state.stamp2Ratio * 100).toFixed(1)}%`;
-
-  const totalTime = estimateTotalTime();
-  if (totalTime === null || totalTime <= 0) {
-    timeFill.style.width = "0%";
-  } else {
-    const ratio = Math.max(0, Math.min(1, state.elapsedTime / totalTime));
-    timeFill.style.width = `${(ratio * 100).toFixed(1)}%`;
-  }
 }
 
 function drawArrow(x, y, vx, vy, color, label) {
@@ -388,35 +316,39 @@ function resetMotion() {
   state.playing = false;
 }
 
-function moveToStamp(ratio) {
-  const clampedRatio = Math.max(0, Math.min(1, ratio));
-  state.playing = false;
-  state.s = clampedRatio * state.planeLength;
-
-  if (state.a > 0) {
-    state.v = Math.sqrt(Math.max(0, 2 * state.a * state.s));
-    state.elapsedTime = Math.sqrt((2 * state.s) / state.a);
-  } else {
-    state.v = 0;
-    state.elapsedTime = 0;
-  }
-
-  state.impactTime = null;
-  state.impactSpeed = null;
-  if (state.s >= state.planeLength) {
-    state.s = state.planeLength;
-    state.impactTime = state.elapsedTime;
-    state.impactSpeed = state.v;
-    state.v = 0;
-  }
-  updateReadouts();
-}
-
 function setPhExpanded(expanded) {
   state.phExpanded = expanded;
   phPanel.classList.toggle("collapsed", !state.phExpanded);
   phBody.hidden = !state.phExpanded;
   phToggleBtn.textContent = state.phExpanded ? "-" : "+";
+}
+
+function runPlay() {
+  if (state.s >= state.planeLength) {
+    state.s = 0;
+    state.v = 0;
+    state.elapsedTime = 0;
+    state.impactTime = null;
+    state.impactSpeed = null;
+  }
+  state.playing = true;
+}
+
+function runPause() {
+  state.playing = false;
+}
+
+function runReset() {
+  resetMotion();
+  updateReadouts();
+}
+
+function toggleSlow() {
+  state.slowMotion = !state.slowMotion;
+  state.timeScale = state.slowMotion ? 0.25 : 1;
+  slowBtn.textContent = `Slow motion: ${state.slowMotion ? "On" : "Off"}`;
+  slowBtn.classList.toggle("slow-on", state.slowMotion);
+  miniSlowBtn.classList.toggle("slow-on", state.slowMotion);
 }
 
 function syncInputs() {
@@ -450,46 +382,39 @@ function syncInputs() {
 });
 
 playBtn.addEventListener("click", () => {
-  if (state.s >= state.planeLength) {
-    state.s = 0;
-    state.v = 0;
-    state.elapsedTime = 0;
-    state.impactTime = null;
-    state.impactSpeed = null;
-  }
-  state.playing = true;
+  runPlay();
 });
 
 pauseBtn.addEventListener("click", () => {
-  state.playing = false;
+  runPause();
 });
 
 slowBtn.addEventListener("click", () => {
-  state.slowMotion = !state.slowMotion;
-  state.timeScale = state.slowMotion ? 0.25 : 1;
-  slowBtn.textContent = `Slow motion: ${state.slowMotion ? "On" : "Off"}`;
-  slowBtn.classList.toggle("slow-on", state.slowMotion);
+  toggleSlow();
 });
 
 phToggleBtn.addEventListener("click", () => {
   setPhExpanded(!state.phExpanded);
 });
 
-stampStart.addEventListener("click", () => {
-  moveToStamp(state.stamp0Ratio);
-});
-
-stampMid.addEventListener("click", () => {
-  moveToStamp(state.stamp1Ratio);
-});
-
-stampEnd.addEventListener("click", () => {
-  moveToStamp(state.stamp2Ratio);
-});
-
 resetBtn.addEventListener("click", () => {
-  resetMotion();
-  updateReadouts();
+  runReset();
+});
+
+miniPlayBtn.addEventListener("click", () => {
+  runPlay();
+});
+
+miniPauseBtn.addEventListener("click", () => {
+  runPause();
+});
+
+miniResetBtn.addEventListener("click", () => {
+  runReset();
+});
+
+miniSlowBtn.addEventListener("click", () => {
+  toggleSlow();
 });
 
 if (window.matchMedia("(max-width: 700px)").matches) {
