@@ -22,10 +22,15 @@ body {
   min-height: 100%;
 }
 
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
 body {
   font-family: "Trebuchet MS", "Segoe UI", sans-serif;
   color: var(--text);
   background: radial-gradient(circle at top left, #eef5ff 0%, var(--bg) 55%, #e6edf8 100%);
+  overscroll-behavior-y: contain;
 }
 
 .layout {
@@ -33,7 +38,8 @@ body {
   display: grid;
   grid-template-columns: minmax(300px, 360px) 1fr;
   gap: 1rem;
-  padding: 1rem;
+  padding: max(0.8rem, env(safe-area-inset-top)) max(0.8rem, env(safe-area-inset-right))
+    max(0.8rem, env(safe-area-inset-bottom)) max(0.8rem, env(safe-area-inset-left));
 }
 
 .panel {
@@ -94,12 +100,14 @@ button {
   border: 0;
   border-radius: 10px;
   padding: 0.7rem 0.8rem;
+  min-height: 44px;
   background: var(--accent);
   color: #fff;
   cursor: pointer;
   font-size: 0.97rem;
   font-weight: 700;
   touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 
 button:hover {
@@ -262,6 +270,12 @@ button:active {
   z-index: 2;
 }
 
+.time-stamp::after {
+  content: "";
+  position: absolute;
+  inset: -10px;
+}
+
 .time-stamp.start {
   left: 0%;
   background: #0f172a;
@@ -344,6 +358,20 @@ button:active {
     padding: 0.78rem 0.8rem;
     font-size: 1rem;
   }
+
+  .check-row input {
+    width: 24px;
+    height: 24px;
+  }
+
+  input[type="range"]::-webkit-slider-thumb {
+    width: 30px;
+    height: 30px;
+  }
+
+  .canvas-timebar-wrap {
+    padding: 0.42rem 0.56rem 0.56rem;
+  }
 }
 
 @media (max-width: 700px) {
@@ -361,14 +389,34 @@ button:active {
   }
 
   .ph-panel {
-    width: 190px;
+    width: 170px;
     top: 10px;
     right: 10px;
+  }
+
+  .ph-head {
+    padding: 0.42rem 0.5rem;
+    font-size: 0.8rem;
+  }
+
+  .ph-body {
+    padding: 0.35rem 0.5rem 0.45rem;
+  }
+
+  .ph-body p {
+    font-size: 0.76rem;
+    margin: 0.15rem 0;
   }
 
   .canvas-timebar-wrap {
     left: 8px;
     right: 8px;
     bottom: 8px;
+    padding: 0.32rem 0.42rem 0.45rem;
+  }
+
+  .timebar-labels {
+    font-size: 0.72rem;
+    margin-bottom: 0.3rem;
   }
 }

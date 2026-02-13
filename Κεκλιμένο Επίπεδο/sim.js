@@ -412,6 +412,13 @@ function moveToStamp(ratio) {
   updateReadouts();
 }
 
+function setPhExpanded(expanded) {
+  state.phExpanded = expanded;
+  phPanel.classList.toggle("collapsed", !state.phExpanded);
+  phBody.hidden = !state.phExpanded;
+  phToggleBtn.textContent = state.phExpanded ? "-" : "+";
+}
+
 function syncInputs() {
   state.thetaDeg = Number(angleSlider.value);
   state.planeLength = Number(lengthSlider.value);
@@ -465,10 +472,7 @@ slowBtn.addEventListener("click", () => {
 });
 
 phToggleBtn.addEventListener("click", () => {
-  state.phExpanded = !state.phExpanded;
-  phPanel.classList.toggle("collapsed", !state.phExpanded);
-  phBody.hidden = !state.phExpanded;
-  phToggleBtn.textContent = state.phExpanded ? "-" : "+";
+  setPhExpanded(!state.phExpanded);
 });
 
 stampStart.addEventListener("click", () => {
@@ -487,6 +491,12 @@ resetBtn.addEventListener("click", () => {
   resetMotion();
   updateReadouts();
 });
+
+if (window.matchMedia("(max-width: 700px)").matches) {
+  setPhExpanded(false);
+} else {
+  setPhExpanded(true);
+}
 
 syncInputs();
 requestAnimationFrame(tick);
