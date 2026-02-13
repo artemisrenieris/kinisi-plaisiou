@@ -15,6 +15,9 @@ const playBtn = document.getElementById("playBtn");
 const pauseBtn = document.getElementById("pauseBtn");
 const resetBtn = document.getElementById("resetBtn");
 const slowBtn = document.getElementById("slowBtn");
+const phPanel = document.getElementById("phPanel");
+const phBody = document.getElementById("phBody");
+const phToggleBtn = document.getElementById("phToggleBtn");
 
 const angleValue = document.getElementById("angleValue");
 const lengthValue = document.getElementById("lengthValue");
@@ -27,18 +30,33 @@ const dispValue = document.getElementById("dispValue");
 const currentHeightValue = document.getElementById("currentHeightValue");
 const heightValue = document.getElementById("heightValue");
 const impactValue = document.getElementById("impactValue");
+const timeStartValue = document.getElementById("timeStartValue");
+const timeMidValue = document.getElementById("timeMidValue");
 const timeEndValue = document.getElementById("timeEndValue");
 const timeFill = document.getElementById("timeFill");
+const stampStart = document.getElementById("stampStart");
+const stampMid = document.getElementById("stampMid");
+const stampEnd = document.getElementById("stampEnd");
+const phAccelValue = document.getElementById("phAccelValue");
+const phVelValue = document.getElementById("phVelValue");
+const phDispValue = document.getElementById("phDispValue");
+const phCurrentHeightValue = document.getElementById("phCurrentHeightValue");
+const phHeightValue = document.getElementById("phHeightValue");
+const phImpactValue = document.getElementById("phImpactValue");
 
 const state = {
   thetaDeg: Number(angleSlider.value),
   planeLength: Number(lengthSlider.value),
+  stamp0Ratio: 0,
+  stamp1Ratio: 0.5,
+  stamp2Ratio: 1,
   m: Number(massSlider.value),
   mu: Number(muSlider.value),
   frictionOn: frictionToggle.checked,
   showVectors: vectorsToggle.checked,
   pushOn: forceToggle.checked,
   forceN: Number(forceSlider.value),
+  phExpanded: true,
   playing: false,
   s: 0,
   v: 0,
@@ -84,6 +102,16 @@ function estimateTotalTime() {
     return null;
   }
   return state.elapsedTime + timeRemaining;
+}
+
+function timeFromStartForDistance(distance) {
+  if (distance <= 0) {
+    return 0;
+  }
+  if (state.a <= 0) {
+    return null;
+  }
+  return Math.sqrt((2 * distance) / state.a);
 }
 
 function rampGeometry() {
@@ -138,18 +166,35 @@ function updateReadouts() {
   muValue.textContent = state.mu.toFixed(2);
   forceValue.textContent = activeForce().toFixed(1);
   accelValue.textContent = state.a.toFixed(2);
+  phAccelValue.textContent = state.a.toFixed(2);
   velValue.textContent = state.v.toFixed(2);
+  phVelValue.textContent = state.v.toFixed(2);
   dispValue.textContent = state.s.toFixed(2);
+  phDispValue.textContent = state.s.toFixed(2);
   currentHeightValue.textContent = ((state.planeLength - state.s) * Math.sin(theta)).toFixed(2);
+  phCurrentHeightValue.textContent = ((state.planeLength - state.s) * Math.sin(theta)).toFixed(2);
   heightValue.textContent = (state.planeLength * Math.sin(theta)).toFixed(2);
+  phHeightValue.textContent = (state.planeLength * Math.sin(theta)).toFixed(2);
   impactValue.textContent = state.impactSpeed === null ? "-" : `${state.impactSpeed.toFixed(2)} m/s`;
+  phImpactValue.textContent = state.impactSpeed === null ? "-" : `${state.impactSpeed.toFixed(2)} m/s`;
+
+  const d0 = state.stamp0Ratio * state.planeLength;
+  const d1 = state.stamp1Ratio * state.planeLength;
+  const d2 = state.stamp2Ratio * state.planeLength;
+  const t0 = timeFromStartForDistance(d0);
+  const t1 = timeFromStartForDistance(d1);
+  const t2 = timeFromStartForDistance(d2);
+  timeStartValue.textContent = t0 === null ? "t0 = -" : `t0 = ${t0.toFixed(2)} s`;
+  timeMidValue.textContent = t1 === null ? "t1 = -" : `t1 = ${t1.toFixed(2)} s`;
+  timeEndValue.textContent = t2 === null ? "t2 = -" : `t2 = ${t2.toFixed(2)} s`;
+  stampStart.style.left = `${(state.stamp0Ratio * 100).toFixed(1)}%`;
+  stampMid.style.left = `${(state.stamp1Ratio * 100).toFixed(1)}%`;
+  stampEnd.style.left = `${(state.stamp2Ratio * 100).toFixed(1)}%`;
 
   const totalTime = estimateTotalTime();
   if (totalTime === null || totalTime <= 0) {
-    timeEndValue.textContent = "t = -";
     timeFill.style.width = "0%";
   } else {
-    timeEndValue.textContent = `t = ${totalTime.toFixed(2)} s`;
     const ratio = Math.max(0, Math.min(1, state.elapsedTime / totalTime));
     timeFill.style.width = `${(ratio * 100).toFixed(1)}%`;
   }
@@ -255,7 +300,8 @@ function drawScene() {
     const mgSin = state.m * g * Math.sin(geom.theta);
     const mgCos = state.m * g * Math.cos(geom.theta);
 
-    const scale = 1.15;
+    const massScale = state.m / 2;
+    const scale = 1.15 * massScale;
 
     drawArrow(blockCenter.x, blockCenter.y, 0, mg * scale, "#d90429", "mg");
     drawArrow(
@@ -342,6 +388,30 @@ function resetMotion() {
   state.playing = false;
 }
 
+function moveToStamp(ratio) {
+  const clampedRatio = Math.max(0, Math.min(1, ratio));
+  state.playing = false;
+  state.s = clampedRatio * state.planeLength;
+
+  if (state.a > 0) {
+    state.v = Math.sqrt(Math.max(0, 2 * state.a * state.s));
+    state.elapsedTime = Math.sqrt((2 * state.s) / state.a);
+  } else {
+    state.v = 0;
+    state.elapsedTime = 0;
+  }
+
+  state.impactTime = null;
+  state.impactSpeed = null;
+  if (state.s >= state.planeLength) {
+    state.s = state.planeLength;
+    state.impactTime = state.elapsedTime;
+    state.impactSpeed = state.v;
+    state.v = 0;
+  }
+  updateReadouts();
+}
+
 function syncInputs() {
   state.thetaDeg = Number(angleSlider.value);
   state.planeLength = Number(lengthSlider.value);
@@ -392,6 +462,25 @@ slowBtn.addEventListener("click", () => {
   state.timeScale = state.slowMotion ? 0.25 : 1;
   slowBtn.textContent = `Slow motion: ${state.slowMotion ? "On" : "Off"}`;
   slowBtn.classList.toggle("slow-on", state.slowMotion);
+});
+
+phToggleBtn.addEventListener("click", () => {
+  state.phExpanded = !state.phExpanded;
+  phPanel.classList.toggle("collapsed", !state.phExpanded);
+  phBody.hidden = !state.phExpanded;
+  phToggleBtn.textContent = state.phExpanded ? "-" : "+";
+});
+
+stampStart.addEventListener("click", () => {
+  moveToStamp(state.stamp0Ratio);
+});
+
+stampMid.addEventListener("click", () => {
+  moveToStamp(state.stamp1Ratio);
+});
+
+stampEnd.addEventListener("click", () => {
+  moveToStamp(state.stamp2Ratio);
 });
 
 resetBtn.addEventListener("click", () => {

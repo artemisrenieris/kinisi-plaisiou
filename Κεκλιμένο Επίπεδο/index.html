@@ -10,16 +10,15 @@
     <main class="layout">
       <section class="panel controls">
         <h1>Κεκλιμένο Επίπεδο</h1>
-        <p class="deploy-test-badge">Live Update Test</p>
 
-        <label for="angleSlider">Γωνία &theta;: <span id="angleValue">25</span>&deg;</label>
-        <input id="angleSlider" type="range" min="0" max="60" step="1" value="25" />
+        <label for="angleSlider">Γωνία &theta;: <span id="angleValue">30</span>&deg;</label>
+        <input id="angleSlider" type="range" min="0" max="60" step="1" value="30" />
 
         <label for="lengthSlider">Μήκος επιπέδου L: <span id="lengthValue">10.0</span> m</label>
         <input id="lengthSlider" type="range" min="2" max="20" step="0.5" value="10" />
 
-        <label for="massSlider">Μάζα m: <span id="massValue">2.0</span> kg</label>
-        <input id="massSlider" type="range" min="0.5" max="10" step="0.1" value="2.0" />
+        <label for="massSlider">Μάζα m: <span id="massValue">5.0</span> kg</label>
+        <input id="massSlider" type="range" min="0.5" max="10" step="0.1" value="5.0" />
 
         <label for="muSlider">Συντελεστής τριβής &mu;: <span id="muValue">0.20</span></label>
         <input id="muSlider" type="range" min="0" max="0.8" step="0.01" value="0.20" />
@@ -56,21 +55,42 @@
           <p>Διάστημα S: <span id="dispValue">0.00</span> m</p>
           <p>Τρέχον ύψος h: <span id="currentHeightValue">0.00</span> m</p>
           <p>Μέγιστο ύψος h<sub>max</sub>: <span id="heightValue">0.00</span> m</p>
-          <p>Ταχύτητα στη βάση: <span id="impactValue">-</span></p>
-          <div class="timebar-wrap">
-            <div class="timebar-labels">
-              <span>0</span>
-              <span id="timeEndValue">t = -</span>
-            </div>
-            <div class="timebar">
-              <div id="timeFill" class="timebar-fill"></div>
-            </div>
-          </div>
+          <p>υ στη βάση: <span id="impactValue">-</span></p>
         </div>
       </section>
 
       <section class="panel sim-area">
-        <canvas id="simCanvas" width="980" height="560" aria-label="Inclined plane simulation"></canvas>
+        <div class="canvas-stage">
+          <canvas id="simCanvas" width="980" height="560" aria-label="Inclined plane simulation"></canvas>
+          <div id="phPanel" class="ph-panel">
+            <div class="ph-head">
+              <span>Μετρήσεις</span>
+              <button id="phToggleBtn" type="button" aria-label="Εμφάνιση/Απόκρυψη μετρήσεων">-</button>
+            </div>
+            <div id="phBody" class="ph-body">
+              <p>α: <span id="phAccelValue">0.00</span> m/s^2</p>
+              <p>υ: <span id="phVelValue">0.00</span> m/s</p>
+              <p>S: <span id="phDispValue">0.00</span> m</p>
+              <p>h: <span id="phCurrentHeightValue">0.00</span> m</p>
+              <p>h<sub>max</sub>: <span id="phHeightValue">0.00</span> m</p>
+              <p>υ<sub>βάσης</sub>: <span id="phImpactValue">-</span></p>
+            </div>
+          </div>
+
+          <div class="canvas-timebar-wrap">
+            <div class="timebar-labels">
+              <span id="timeStartValue">t0 = 0.00 s</span>
+              <span id="timeMidValue">t1 = -</span>
+              <span id="timeEndValue">t2 = -</span>
+            </div>
+            <div class="timebar">
+              <div id="timeFill" class="timebar-fill"></div>
+              <div id="stampStart" class="time-stamp start"></div>
+              <div id="stampMid" class="time-stamp mid"></div>
+              <div id="stampEnd" class="time-stamp end"></div>
+            </div>
+          </div>
+        </div>
 
         <div class="legend">
           <span><i class="mg"></i> mg</span>

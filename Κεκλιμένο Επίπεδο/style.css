@@ -55,18 +55,6 @@ h1 {
   font-size: 1.36rem;
 }
 
-.deploy-test-badge {
-  margin: -0.1rem 0 0.4rem;
-  display: inline-block;
-  font-size: 0.82rem;
-  font-weight: 800;
-  letter-spacing: 0.04em;
-  color: #ffffff;
-  background: #d00000;
-  padding: 0.2rem 0.45rem;
-  border-radius: 999px;
-}
-
 label {
   font-size: 0.96rem;
   font-weight: 600;
@@ -144,12 +132,6 @@ button:active {
   font-size: 0.94rem;
 }
 
-.timebar-wrap {
-  margin-top: 0.45rem;
-  padding-top: 0.45rem;
-  border-top: 1px dashed var(--line);
-}
-
 .timebar-labels {
   display: flex;
   justify-content: space-between;
@@ -181,12 +163,118 @@ button:active {
   gap: 0.74rem;
 }
 
+.canvas-stage {
+  position: relative;
+}
+
 #simCanvas {
   width: 100%;
   height: auto;
   border: 1px solid var(--line);
   border-radius: 10px;
   background: linear-gradient(180deg, #f8fbff 0%, #eef3fa 100%);
+}
+
+.ph-panel {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 220px;
+  max-width: calc(100% - 24px);
+  border: 1px solid #b9c8dd;
+  border-radius: 10px;
+  background: rgb(255 255 255 / 95%);
+  box-shadow: 0 8px 20px rgb(13 38 76 / 18%);
+  backdrop-filter: blur(2px);
+}
+
+.ph-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.5rem 0.6rem;
+  border-bottom: 1px solid #d7e1ef;
+  font-size: 0.88rem;
+  font-weight: 800;
+}
+
+#phToggleBtn {
+  width: 30px;
+  min-width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  padding: 0;
+  font-size: 1rem;
+  line-height: 1;
+  background: #234a76;
+}
+
+.ph-body {
+  padding: 0.45rem 0.6rem 0.55rem;
+}
+
+.ph-body p {
+  margin: 0.22rem 0;
+  font-size: 0.83rem;
+  font-weight: 700;
+}
+
+.ph-panel.collapsed {
+  width: auto;
+}
+
+.ph-panel.collapsed .ph-head {
+  border-bottom: 0;
+}
+
+.ph-panel.collapsed .ph-body {
+  display: none;
+}
+
+.canvas-timebar-wrap {
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  bottom: 12px;
+  border: 1px solid #c9d7ea;
+  border-radius: 10px;
+  padding: 0.38rem 0.52rem 0.5rem;
+  background: rgb(255 255 255 / 92%);
+  box-shadow: 0 6px 14px rgb(13 38 76 / 16%);
+}
+
+.canvas-timebar-wrap .timebar {
+  position: relative;
+}
+
+.time-stamp {
+  position: absolute;
+  top: 50%;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2px solid #ffffff;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 0 0 1px rgb(0 0 0 / 22%);
+  cursor: pointer;
+  pointer-events: auto;
+  z-index: 2;
+}
+
+.time-stamp.start {
+  left: 0%;
+  background: #0f172a;
+}
+
+.time-stamp.mid {
+  left: 50%;
+  background: #ff7b00;
+}
+
+.time-stamp.end {
+  left: 100%;
+  background: #005f73;
 }
 
 .legend {
@@ -270,5 +358,17 @@ button:active {
 
   .btn-row {
     grid-template-columns: 1fr;
+  }
+
+  .ph-panel {
+    width: 190px;
+    top: 10px;
+    right: 10px;
+  }
+
+  .canvas-timebar-wrap {
+    left: 8px;
+    right: 8px;
+    bottom: 8px;
   }
 }
