@@ -10,7 +10,9 @@ const vectorsToggle = document.getElementById("vectorsToggle");
 const currentVectorsToggle = document.getElementById("currentVectorsToggle");
 const bDirBtn = document.getElementById("bDirBtn");
 
-const playPauseBtn = document.getElementById("playPauseBtn");
+// Backward-compatible ids help when Netlify serves cached/older HTML.
+const playPauseBtn = document.getElementById("playPauseBtn") || document.getElementById("playBtn");
+const pauseBtn = document.getElementById("pauseBtn");
 const resetBtn = document.getElementById("resetBtn");
 const slowBtn = document.getElementById("slowBtn");
 
@@ -44,8 +46,8 @@ const state = {
   w: Number(wSlider.value),
   R: Number(rSlider.value),
   uSet: Number(uSlider.value),
-  showVectors: vectorsToggle.checked,
-  showCurrentVectors: currentVectorsToggle.checked,
+  showVectors: vectorsToggle ? vectorsToggle.checked : true,
+  showCurrentVectors: currentVectorsToggle ? currentVectorsToggle.checked : true,
   playing: false,
   slowMotion: false,
   timeScale: BASE_TIME_SCALE,
@@ -93,7 +95,9 @@ function syncSlidersUI() {
 }
 
 function syncPlayPauseUI() {
-  playPauseBtn.textContent = state.playing ? "Pause" : "Play";
+  if (playPauseBtn) {
+    playPauseBtn.textContent = state.playing ? "Pause" : "Play";
+  }
 }
 
 function recalcMeasured() {
@@ -359,23 +363,38 @@ uSlider.addEventListener("input", () => {
   state.u = state.uSet;
 });
 
-vectorsToggle.addEventListener("change", () => {
-  state.showVectors = vectorsToggle.checked;
-});
+if (vectorsToggle) {
+  vectorsToggle.addEventListener("change", () => {
+    state.showVectors = vectorsToggle.checked;
+  });
+}
 
-currentVectorsToggle.addEventListener("change", () => {
-  state.showCurrentVectors = currentVectorsToggle.checked;
-});
+if (currentVectorsToggle) {
+  currentVectorsToggle.addEventListener("change", () => {
+    state.showCurrentVectors = currentVectorsToggle.checked;
+  });
+}
 
-bDirBtn.addEventListener("click", () => {
-  state.Bdir *= -1;
-  bDirBtn.textContent = state.Bdir > 0 ? "B: προς τα μέσα (×)" : "B: προς τα έξω (•)";
-});
+if (bDirBtn) {
+  bDirBtn.addEventListener("click", () => {
+    state.Bdir *= -1;
+    bDirBtn.textContent = state.Bdir > 0 ? "B: προς τα μέσα (×)" : "B: προς τα έξω (•)";
+  });
+}
 
-playPauseBtn.addEventListener("click", () => {
-  state.playing = !state.playing;
-  syncPlayPauseUI();
-});
+if (playPauseBtn) {
+  playPauseBtn.addEventListener("click", () => {
+    state.playing = !state.playing;
+    syncPlayPauseUI();
+  });
+}
+
+if (pauseBtn) {
+  pauseBtn.addEventListener("click", () => {
+    state.playing = false;
+    syncPlayPauseUI();
+  });
+}
 
 resetBtn.addEventListener("click", resetSimulation);
 
